@@ -3,14 +3,19 @@ namespace AppBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
-class ParserController
+class ParserController extends Controller
 {
 	/**
-	 * @Route("/parser")
+	 * @Route("/parser", name="parser")
 	 */
 	public function parserAction()
 	{
-		return new Response('Hello!');
+		$rows = 1001;
+
+		return $this->render('parser/parsing.html.twig', array(
+			'rows' => $rows,
+		));
 	}
 }
