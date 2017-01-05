@@ -20,13 +20,12 @@ class ParserController extends Controller
 		 */
 
 		$rows = 1001;
-
-		/*$file = new \SplFileObject($this->getParameter('kernel.root_dir').'/documents/stock.csv');
-		$reader = new CsvReader($file);
-		$reader->setHeaderRowNumber(0);
+		$parser = $this->get('app.parser');
+		$parser->setParameters($this->getParameter('kernel.root_dir').'/documents/stock.csv');
+		$reader = $parser->readFile();
 		foreach ($reader as $row) {
 			print_r($row);
-		}*/
+		}
 
 		$repository = $this->getDoctrine()->getRepository('AppBundle:Product');
 		$products = $repository->findAll();
