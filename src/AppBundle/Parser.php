@@ -39,7 +39,8 @@ class Parser
 		$report = array(
 			'processed' => 0,
 			'successful' => 0,
-			'skipped' => 0
+			'skipped' => 0,
+			'skipped_items' => array(),
 		);
 
 		foreach ($reader as $row)
@@ -70,6 +71,8 @@ class Parser
 				{
 					$container->get('doctrine')->resetManager();
 					$report['skipped']++;
+					$row['error'] = 'product with this code is exists';
+					$report['skipped_items'][] = $row;
 					continue;
 				}
 				$report['successful']++;
@@ -77,6 +80,21 @@ class Parser
 			else
 			{
 				$report['skipped']++;
+				$row['error'] = 'mismatch condition';
+				$report['skipped_items'][] = $row;
+			}
+		}
+
+		foreach ($reader as $row)
+		{
+			$product = $container->get('doctrine')
+				->getRepository('AppBundle:Product')
+				->findOneBy(array('code' => $row['Product Code']));
+			if($product)
+			{
+				$em = $container->get('doctrine')->getManager();
+				$em->remove($product);
+				$em->flush();
 			}
 		}
 
