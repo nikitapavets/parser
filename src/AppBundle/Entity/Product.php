@@ -2,206 +2,240 @@
 
 namespace AppBundle\Entity;
 
-
 use Doctrine\ORM\Mapping as ORM;
-use Gedmo\Mapping\Annotation as Gedmo;
-use Gedmo\Timestampable\Traits\TimestampableEntity;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * Class Product
  * @package AppBundle\Entity
  * @ORM\Entity
- * @ORM\Table(name="product")
+ * @ORM\Table(name="tblProductData")
+ * @UniqueEntity("strProductCode")
  */
 class Product
 {
 	/**
-	 * @var integer
-	 *
-	 * @ORM\Column(type="integer")
+	 * @ORM\Column(name="intProductDataId", type="integer", options={"unsigned"=true})
 	 * @ORM\Id
 	 * @ORM\GeneratedValue(strategy="AUTO")
 	 */
-	private $product_id;
+	private $id;
 
 	/**
-	 * @var string
-	 *
-	 * @ORM\Column(type="string", length=50)
+	 * @ORM\Column(name="strProductName", type="string", length=50)
 	 */
-	private $product_name;
+	private $name;
 
 	/**
-	 * @var string
-	 *
-	 * @ORM\Column(type="string", length=255)
+	 * @ORM\Column(name="strProductDesc", type="string", length=255)
 	 */
-	private $product_desc;
+	private $desc;
 
 	/**
-	 * @var string
-	 *
-	 * @ORM\Column(type="string", length=255)
+	 * @ORM\Column(name="strProductCode", type="string", length=10, unique=true)
 	 */
-	private $product_code;
+	private $code;
 
 	/**
-	 * @var \DateTime
-	 *
-	 * @ORM\Column(type="datetime", nullable=true, unique=true)
+	 * @ORM\Column(name="intProductStock", type="integer")
 	 */
-	private $added;
+	private $stock;
 
 	/**
-	 * @var \DateTime
-	 *
-	 * @ORM\Column(type="datetime", nullable=true)
+	 * @ORM\Column(name="intProductCost", type="float")
 	 */
-	private $discontinued;
+	private $cost;
 
 	/**
-	 * @var \DateTime
-	 *
-	 * @Gedmo\Timestampable(on="update")
-	 * @ORM\Column(type="datetime", nullable=true)
+	 * @ORM\Column(name="dtmAdded", type="datetime", nullable=true)
+	 */
+	private $added_at;
+
+	/**
+	 * @ORM\Column(name="dtmDiscontinued", type="datetime", nullable=true)
+	 */
+	private $discontinued_at;
+
+	/**
+	 * @ORM\Column(name="stmTimestamp", type="datetime", options={"default":0}, columnDefinition="DATETIME on update CURRENT_TIMESTAMP")
 	 */
 	private $timestamp;
 
     /**
-     * Get productId
+     * Get id
      *
-     * @return integer
+     * @return integer 
      */
-    public function getProductId()
+    public function getId()
     {
-        return $this->product_id;
+        return $this->id;
     }
 
     /**
-     * Set productName
+     * Set name
      *
-     * @param string $productName
-     *
+     * @param string $name
      * @return Product
      */
-    public function setProductName($productName)
+    public function setName($name)
     {
-        $this->product_name = $productName;
+        $this->name = $name;
 
         return $this;
     }
 
     /**
-     * Get productName
+     * Get name
      *
-     * @return string
+     * @return string 
      */
-    public function getProductName()
+    public function getName()
     {
-        return $this->product_name;
+        return $this->name;
     }
 
     /**
-     * Set productDesc
+     * Set desc
      *
-     * @param string $productDesc
-     *
+     * @param string $desc
      * @return Product
      */
-    public function setProductDesc($productDesc)
+    public function setDesc($desc)
     {
-        $this->product_desc = $productDesc;
+        $this->desc = $desc;
 
         return $this;
     }
 
     /**
-     * Get productDesc
+     * Get desc
      *
-     * @return string
+     * @return string 
      */
-    public function getProductDesc()
+    public function getDesc()
     {
-        return $this->product_desc;
+        return $this->desc;
     }
 
     /**
-     * Set productCode
+     * Set code
      *
-     * @param string $productCode
-     *
+     * @param string $code
      * @return Product
      */
-    public function setProductCode($productCode)
+    public function setCode($code)
     {
-        $this->product_code = $productCode;
+        $this->code = $code;
 
         return $this;
     }
 
     /**
-     * Get productCode
+     * Get code
      *
-     * @return string
+     * @return string 
      */
-    public function getProductCode()
+    public function getCode()
     {
-        return $this->product_code;
+        return $this->code;
     }
 
     /**
-     * Set added
+     * Set stock
      *
-     * @param \DateTime $added
-     *
+     * @param integer $stock
      * @return Product
      */
-    public function setAdded($added)
+    public function setStock($stock)
     {
-        $this->added = $added;
+        $this->stock = $stock;
 
         return $this;
     }
 
     /**
-     * Get added
+     * Get stock
      *
-     * @return \DateTime
+     * @return integer 
      */
-    public function getAdded()
+    public function getStock()
     {
-        return $this->added;
+        return $this->stock;
     }
 
     /**
-     * Set discontinued
+     * Set cost
      *
-     * @param \DateTime $discontinued
-     *
+     * @param float $cost
      * @return Product
      */
-    public function setDiscontinued($discontinued)
+    public function setCost($cost)
     {
-        $this->discontinued = $discontinued;
+        $this->cost = $cost;
 
         return $this;
     }
 
     /**
-     * Get discontinued
+     * Get cost
      *
-     * @return \DateTime
+     * @return float 
      */
-    public function getDiscontinued()
+    public function getCost()
     {
-        return $this->discontinued;
+        return $this->cost;
+    }
+
+    /**
+     * Set added_at
+     *
+     * @param \DateTime $addedAt
+     * @return Product
+     */
+    public function setAddedAt($addedAt)
+    {
+        $this->added_at = $addedAt;
+
+        return $this;
+    }
+
+    /**
+     * Get added_at
+     *
+     * @return \DateTime 
+     */
+    public function getAddedAt()
+    {
+        return $this->added_at;
+    }
+
+    /**
+     * Set discontinued_at
+     *
+     * @param \DateTime $discontinuedAt
+     * @return Product
+     */
+    public function setDiscontinuedAt($discontinuedAt)
+    {
+        $this->discontinued_at = $discontinuedAt;
+
+        return $this;
+    }
+
+    /**
+     * Get discontinued_at
+     *
+     * @return \DateTime 
+     */
+    public function getDiscontinuedAt()
+    {
+        return $this->discontinued_at;
     }
 
     /**
      * Set timestamp
      *
      * @param \DateTime $timestamp
-     *
      * @return Product
      */
     public function setTimestamp($timestamp)
@@ -214,7 +248,7 @@ class Product
     /**
      * Get timestamp
      *
-     * @return \DateTime
+     * @return \DateTime 
      */
     public function getTimestamp()
     {

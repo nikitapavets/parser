@@ -2,34 +2,84 @@
 
 namespace AppBundle;
 
-
 use Ddeboer\DataImport\Reader\CsvReader;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use AppBundle\Entity\Product;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class Parser
 {
 	private $_file;
 
 	/**
-	 * Set file parameters
-	 *
-	 * @param string $fileName
+	 * @param string $filename
 	 */
-	public function setParameters($fileName)
+	public function setFilename($filename)
 	{
-		$this->_file = new \SplFileObject($fileName);
+		$this->_file = new \SplFileObject($filename);
 	}
 
 	/**
-	 * Parse scv file to array
-	 *
 	 * @return CsvReader
 	 */
-	public function readFile()
+	public function parseFile()
 	{
 		$reader = new CsvReader($this->_file);
 		$reader->setHeaderRowNumber(0);
-
 		return $reader;
+	}
+
+	/**
+	 * @param CsvReader $reader
+	 * @param ContainerInterface $container
+	 * @return array
+	 */
+	public function saveProducts($reader, $container)
+	{
+		$report = array(
+			'processed' => 0,
+			'successful' => 0,
+			'skipped' => 0
+		);
+
+		foreach ($reader as $row)
+		{
+			$report['processed']++;
+
+			if(!((((int)$row['Cost in GBP'] < 5) && ((int)$row['Stock'] < 10)) || ((int)$row['Cost in GBP'] > 1000)))
+			{
+				$product = new Product();
+				$product->setCode($row['Product Code']);
+				$product->setName($row['Product Name']);
+				$product->setDesc($row['Product Description']);
+				$product->setStock($row['Stock']);
+				$product->setCost($row['Cost in GBP']);
+				$product->setAddedAt(new \DateTime());
+				if($row['Discontinued'] == 'yes')
+				{
+					$product->setDiscontinuedAt(new \DateTime());
+				}
+
+				$em = $container->get('doctrine')->getManager();
+				try
+				{
+					$em->persist($product);
+					$em->flush();
+				}
+				catch (UniqueConstraintViolationException $e)
+				{
+					$container->get('doctrine')->resetManager();
+					$report['skipped']++;
+					continue;
+				}
+				$report['successful']++;
+			}
+			else
+			{
+				$report['skipped']++;
+			}
+		}
+
+		return $report;
 	}
 }

@@ -1,0 +1,63 @@
+<?php
+
+namespace AppBundle\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+
+/**
+ * Class Product
+ * @package AppBundle\Entity
+ * @ORM\Entity
+ * @ORM\Table(name="tblProductData")
+ * @UniqueEntity("strProductCode")
+ */
+class Product
+{
+	/**
+	 * @ORM\Column(name="intProductDataId", type="integer", options={"unsigned"=true})
+	 * @ORM\Id
+	 * @ORM\GeneratedValue(strategy="AUTO")
+	 */
+	private $id;
+
+	/**
+	 * @ORM\Column(name="strProductName", type="string", length=50)
+	 */
+	private $name;
+
+	/**
+	 * @ORM\Column(name="strProductDesc", type="string", length=255)
+	 */
+	private $desc;
+
+	/**
+	 * @ORM\Column(name="strProductCode", type="string", length=10, unique=true)
+	 */
+	private $code;
+
+	/**
+	 * @ORM\Column(name="intProductStock", type="integer")
+	 */
+	private $stock;
+
+	/**
+	 * @ORM\Column(name="intProductCost", type="float")
+	 */
+	private $cost;
+
+	/**
+	 * @ORM\Column(name="dtmAdded", type="datetime", nullable=true)
+	 */
+	private $added_at;
+
+	/**
+	 * @ORM\Column(name="dtmDiscontinued", type="datetime", nullable=true)
+	 */
+	private $discontinued_at;
+
+	/**
+	 * @ORM\Column(name="stmTimestamp", type="datetime", options={"default":0})
+	 */
+	private $timestamp;
+}
