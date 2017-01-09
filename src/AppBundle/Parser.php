@@ -20,16 +20,21 @@ class Parser
 	}
 
 	/**
+	 * Parsing csv-file
+	 *
 	 * @return CsvReader
 	 */
 	public function parseFile()
 	{
 		$reader = new CsvReader($this->_file);
 		$reader->setHeaderRowNumber(0);
+		$reader->setStrict(false);
 		return $reader;
 	}
 
 	/**
+	 * Import products to database
+	 *
 	 * @param CsvReader $reader
 	 * @param ContainerInterface $container
 	 * @return array
@@ -53,8 +58,22 @@ class Parser
 				$product->setCode($row['Product Code']);
 				$product->setName($row['Product Name']);
 				$product->setDesc($row['Product Description']);
+				if(!is_numeric($row['Stock']))
+				{
+					$report['skipped']++;
+					$row['error'] = 'column `Stock` is invalid';
+					$report['skipped_items'][] = $row;
+					continue;
+				}
 				$product->setStock($row['Stock']);
-				$product->setCost($row['Cost in GBP']);
+				if(!is_numeric($row['Cost in GBP']))
+				{
+					$report['skipped']++;
+					$row['error'] = 'column `Cost in GBP` is invalid';
+					$report['skipped_items'][] = $row;
+					continue;
+				}
+				$product->setCost((double)$row['Cost in GBP']);
 				$product->setAddedAt(new \DateTime());
 				if($row['Discontinued'] == 'yes')
 				{

@@ -9,6 +9,9 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 class ParseFileCommandTest extends KernelTestCase
 {
+	/**
+	 * Test parsing svg file and import this to database
+	 */
 	public function testParseStockFile()
 	{
 		self::bootKernel();

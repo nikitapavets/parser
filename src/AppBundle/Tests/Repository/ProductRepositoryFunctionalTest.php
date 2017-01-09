@@ -23,7 +23,10 @@ class ProductRepositoryFunctionalTest extends KernelTestCase
 			->getManager();
 	}
 
-	public function testSearchByCategoryName()
+	/**
+	 *  Test count products on database
+	 */
+	public function testSearchAllProducts()
 	{
 		$products = $this->em
 			->getRepository('AppBundle:Product')

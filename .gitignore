@@ -11,3 +11,5 @@
 /bin/
 /composer.phar
 /.idea
+/phpunit.phar
+/composer.lock
