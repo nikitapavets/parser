@@ -12,6 +12,8 @@ class Parser
 	private $_file;
 
 	/**
+	 * Get file resourse by file name
+	 *
 	 * @param string $filename
 	 */
 	public function setFilename($filename)

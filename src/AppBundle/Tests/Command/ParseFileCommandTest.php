@@ -25,6 +25,6 @@ class ParseFileCommandTest extends KernelTestCase
 			'filename' => '/documents/stock.csv',
 		));
 		$output = $commandTester->getDisplay();
-		$this->assertContains('Processed: 27, Successful: 24, Skipped: 3', $output);
+		$this->assertContains('Processed: 29, Successful: 23, Skipped: 6', $output);
 	}
 }
