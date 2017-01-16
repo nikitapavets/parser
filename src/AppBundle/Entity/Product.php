@@ -3,6 +3,7 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
@@ -10,61 +11,72 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @package AppBundle\Entity
  * @ORM\Entity
  * @ORM\Table(name="tblProductData")
- * @UniqueEntity("strProductCode")
+ * @Assert\Expression(
+ *     "(this.getCost() >= 5 || this.getStock() >= 10)",
+ *     message="Cost should be greater than or equal to 5 and Stock should be greater than or equal to 10."
+ * )
  */
 class Product
 {
-	/**
-	 * @ORM\Column(name="intProductDataId", type="integer", options={"unsigned"=true})
-	 * @ORM\Id
-	 * @ORM\GeneratedValue(strategy="AUTO")
-	 */
-	private $id;
+    /**
+     * @ORM\Column(name="intProductDataId", type="integer", options={"unsigned"=true})
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    private $id;
 
-	/**
-	 * @ORM\Column(name="strProductName", type="string", length=50)
-	 */
-	private $name;
+    /**
+     * @ORM\Column(name="strProductName", type="string", length=50)
+     * @Assert\NotBlank()
+     */
+    private $name;
 
-	/**
-	 * @ORM\Column(name="strProductDesc", type="string", length=255)
-	 */
-	private $desc;
+    /**
+     * @ORM\Column(name="strProductDesc", type="string", length=255)
+     * @Assert\NotBlank()
+     */
+    private $desc;
 
-	/**
-	 * @ORM\Column(name="strProductCode", type="string", length=10, unique=true)
-	 */
-	private $code;
+    /**
+     * @ORM\Column(name="strProductCode", type="string", length=10, unique=true)
+     * @Assert\NotBlank()
+     */
+    private $code;
 
-	/**
-	 * @ORM\Column(name="intProductStock", type="integer")
-	 */
-	private $stock;
+    /**
+     * @ORM\Column(name="intProductStock", type="integer", options={"unsigned"=true})
+     * @Assert\Type("int")
+     * @Assert\NotBlank()
+     */
+    private $stock;
 
-	/**
-	 * @ORM\Column(name="intProductCost", type="float")
-	 */
-	private $cost;
+    /**
+     * @ORM\Column(name="intProductCost", type="decimal", precision=15, scale=2)
+     * @Assert\LessThanOrEqual(1000)
+     * @Assert\Type("numeric")
+     * @Assert\NotBlank()
+     */
+    private $cost;
 
-	/**
-	 * @ORM\Column(name="dtmAdded", type="datetime", nullable=true)
-	 */
-	private $added_at;
+    /**
+     * @ORM\Column(name="dtmAdded", type="datetime", nullable=true)
+     */
+    private $added_at;
 
-	/**
-	 * @ORM\Column(name="dtmDiscontinued", type="datetime", nullable=true)
-	 */
-	private $discontinued_at;
+    /**
+     * @ORM\Column(name="dtmDiscontinued", type="datetime", nullable=true)
+     */
+    private $discontinued_at;
 
-	/**
-	 * @ORM\Column(name="stmTimestamp", type="datetime", options={"default":0}, columnDefinition="DATETIME on update CURRENT_TIMESTAMP")
-	 */
-	private $timestamp;
+    /**
+     * @ORM\Column(name="stmTimestamp", type="datetime", options={"default":0}, columnDefinition="DATETIME on update CURRENT_TIMESTAMP")
+     */
+    private $timestamp;
 
     /**
      * Get id
      *
-     * @return integer 
+     * @return integer
      */
     public function getId()
     {
@@ -87,7 +99,7 @@ class Product
     /**
      * Get name
      *
-     * @return string 
+     * @return string
      */
     public function getName()
     {
@@ -110,7 +122,7 @@ class Product
     /**
      * Get desc
      *
-     * @return string 
+     * @return string
      */
     public function getDesc()
     {
@@ -133,7 +145,7 @@ class Product
     /**
      * Get code
      *
-     * @return string 
+     * @return string
      */
     public function getCode()
     {
@@ -156,7 +168,7 @@ class Product
     /**
      * Get stock
      *
-     * @return integer 
+     * @return integer
      */
     public function getStock()
     {
@@ -179,7 +191,7 @@ class Product
     /**
      * Get cost
      *
-     * @return float 
+     * @return float
      */
     public function getCost()
     {
@@ -202,7 +214,7 @@ class Product
     /**
      * Get added_at
      *
-     * @return \DateTime 
+     * @return \DateTime
      */
     public function getAddedAt()
     {
@@ -225,7 +237,7 @@ class Product
     /**
      * Get discontinued_at
      *
-     * @return \DateTime 
+     * @return \DateTime
      */
     public function getDiscontinuedAt()
     {
@@ -248,7 +260,7 @@ class Product
     /**
      * Get timestamp
      *
-     * @return \DateTime 
+     * @return \DateTime
      */
     public function getTimestamp()
     {

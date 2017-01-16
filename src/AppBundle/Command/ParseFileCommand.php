@@ -7,7 +7,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use AppBundle\Parser;
-use AppBundle\Entity\Product;
+use AppBundle\Product;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 
 class ParseFileCommand extends ContainerAwareCommand
@@ -31,8 +31,15 @@ class ParseFileCommand extends ContainerAwareCommand
 		$parser->setFilename($this->getContainer()->getParameter('kernel.root_dir').$input->getArgument('filename'));
 		$reader = $parser->parseFile();
 		$report = $parser->saveProducts($reader, $this->getContainer());
-
-		$output->writeln(
+        if($report)
+        {
+            foreach ($report as $r)
+            {
+                $output->writeln($r['element']);
+                $output->writeln($r['errors']);
+            }
+        }
+		/*$output->writeln(
 			'Processed: ' . $report['processed'] .
 			', Successful: ' . $report['successful'] .
 			', Skipped: ' . $report['skipped']
@@ -46,7 +53,7 @@ class ParseFileCommand extends ContainerAwareCommand
 				$output->writeln('Product code '. $skippedItem['Product Code']);
 				$output->writeln(' - Error: '. $skippedItem['error']);
 			}
-		}
+		}*/
 
 	}
 }
