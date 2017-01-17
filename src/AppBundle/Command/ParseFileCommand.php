@@ -33,27 +33,21 @@ class ParseFileCommand extends ContainerAwareCommand
 		$report = $parser->saveProducts($reader, $this->getContainer());
         if($report)
         {
-            foreach ($report as $r)
+            $output->writeln(
+                'Processed: ' . $report['general']['processed'] .
+                ', Successful: ' . $report['general']['successful'] .
+                ', Skipped: ' . $report['general']['skipped']
+            );
+            if(count($report['desc']))
+            {
+                $output->writeln('Errors:');
+            }
+            foreach ($report['desc'] as $r)
             {
                 $output->writeln($r['element']);
                 $output->writeln($r['errors']);
             }
         }
-		/*$output->writeln(
-			'Processed: ' . $report['processed'] .
-			', Successful: ' . $report['successful'] .
-			', Skipped: ' . $report['skipped']
-		);
-
-		if(count($report['skipped_items']) > 0)
-		{
-			$output->writeln('Skipped items:');
-			foreach ($report['skipped_items'] as $skippedItem)
-			{
-				$output->writeln('Product code '. $skippedItem['Product Code']);
-				$output->writeln(' - Error: '. $skippedItem['error']);
-			}
-		}*/
 
 	}
 }

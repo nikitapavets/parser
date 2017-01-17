@@ -43,16 +43,34 @@ class Parser
 	}
 
     /**
-     * @param EntityManagerInterface $entityManager
-     * @param array $item
+     * @param $doctrine
+     * @param array $items
+     * @param int $pocketSize
+     * @return int
      */
-    public function fillDb($entityManager, $item)
+    public function fillDb($doctrine, $items, $pocketSize = 10)
     {
-        print_r($item);
-        $writer = new DoctrineWriter($entityManager, 'AppBundle:Product', 'strProductCode');
+        $failedRows = 0;
+        $writer = new DoctrineWriter($doctrine->getManager(), 'AppBundle:Product', 'strProductCode');
         $writer->prepare();
-        $writer->writeItem($item);
-        $writer->finish();
+        for($i = 0; $i < count($items); $i += $pocketSize)
+        {
+            for($j = 0; $i + $j < count($items) && $j < $pocketSize; $j++)
+            {
+                $writer->writeItem($items[$i + $j]);
+            }
+            try
+            {
+                $writer->finish();
+            }
+            catch (UniqueConstraintViolationException $e)
+            {
+                $failedRows++;
+                $doctrine->resetManager();
+                $writer = new DoctrineWriter($doctrine->getManager(), 'AppBundle:Product', 'strProductCode');
+            }
+        }
+        return $failedRows;
     }
 
 	/**
@@ -64,131 +82,61 @@ class Parser
 	 */
 	public function saveProducts($reader, $container)
     {
-        /*$em = $container->get('doctrine')->getManager();
+        $doctrine = $container->get('doctrine');
 
-        $workflow = new Workflow($reader);
-        $doctrineWriter = new DoctrineWriter($em, 'AppBundle:Product');
-        $workflow->addWriter($doctrineWriter);
-        $workflow->process(); */
+        $response = array(
+            'general' => array(
+                'processed' => 0,
+                'successful' => 0,
+                'skipped' => 0,
+            ),
+            'desc' => array(),
+        );
+        $validProducts = array();
 
-        $em = $container->get('doctrine')->getManager();
-
-        $response = array();
         foreach ($reader as $row)
 		{
+            $response['general']['processed']++;
+
             $product = new Product();
             $product->setCode($row[$container->getParameter('scv_product_code')]);
             $product->setName($row[$container->getParameter('scv_product_name')]);
             $product->setDesc($row[$container->getParameter('scv_product_description')]);
             $product->setStock((int)$row[$container->getParameter('scv_product_stock')]);
             $product->setCost($row[$container->getParameter('scv_product_cost')]);
-            $product->setAddedAt(new \DateTime());
 
             $validator = $container->get('validator');
             $errors = $validator->validate($product);
 
             if (count($errors) > 0)
             {
-                $response[] = [
+                $response['general']['skipped']++;
+                $response['desc'][] = [
                     'element' => $product->getCode(),
                     'errors' => (string)$errors
                 ];
             }
             else
             {
-                $item = array(
-                  'name' => 'asdasd',
-                );
-                $this->fillDb($em, $item);
+                $encoders = array(new XmlEncoder(), new JsonEncoder());
+                $normalizers = array(new ObjectNormalizer());
+                $serializer = new Serializer($normalizers, $encoders);
+
+                $array = $serializer->normalize($product);
+                $array['addedAt'] = new \DateTime();
+                if($row[$container->getParameter('scv_product_discontinued')] == 'yes')
+                {
+                    $array['discontinuedAt'] = new \DateTime();
+                }
+                $validProducts[] = $array;
             }
         }
 
+        $failedRows = $this->fillDb($doctrine, $validProducts);
+        $response['general']['skipped'] += $failedRows;
+        $response['general']['successful']  = $response['general']['processed'] - $response['general']['skipped'];
+
         return $response;
 
-
-        /*if($row['Discontinued'] == 'yes')
-        {
-            $product->setDiscontinuedAt(new \DateTime());
-        }*/
-
-
-
-//		$report = array(
-//			'processed' => 0,
-//			'successful' => 0,
-//			'skipped' => 0,
-//			'skipped_items' => array(),
-//		);
-//
-//		foreach ($reader as $row)
-//		{
-//			$report['processed']++;
-//
-//			if(!((((int)$row[$container->getParameter('scv_product_cost')] < 5) && ((int)$row['Stock'] < 10)) || ((int)$row['Cost in GBP'] > 1000)))
-//			{
-//				$product = new Product();
-//				$product->setCode($row['Product Code']);
-//				$product->setName($row['Product Name']);
-//				$product->setDesc($row['Product Description']);
-//				if(!is_numeric($row['Stock']))
-//				{
-//					$report['skipped']++;
-//					$row['error'] = 'column `Stock` is invalid';
-//					$report['skipped_items'][] = $row;
-//					continue;
-//				}
-//				$product->setStock($row['Stock']);
-//				if(!is_numeric($row['Cost in GBP']))
-//				{
-//					$report['skipped']++;
-//					$row['error'] = 'column `Cost in GBP` is invalid';
-//					$report['skipped_items'][] = $row;
-//					continue;
-//				}
-//				$product->setCost((double)$row['Cost in GBP']);
-//				$product->setAddedAt(new \DateTime());
-//				if($row['Discontinued'] == 'yes')
-//				{
-//					$product->setDiscontinuedAt(new \DateTime());
-//				}
-//
-//				$em = $container->get('doctrine')->getManager();
-//				try
-//				{
-//					$em->persist($product);
-//					$em->flush();
-//				}
-//				catch (UniqueConstraintViolationException $e)
-//				{
-//					$container->get('doctrine')->resetManager();
-//					$report['skipped']++;
-//					$row['error'] = 'product with this code is exists';
-//					$report['skipped_items'][] = $row;
-//					continue;
-//				}
-//				$report['successful']++;
-//			}
-//			else
-//			{
-//				$report['skipped']++;
-//				$row['error'] = 'mismatch condition';
-//				$report['skipped_items'][] = $row;
-//			}
-//		}
-//
-//		foreach ($reader as $row)
-//		{
-//			$product = $container->get('doctrine')
-//				->getRepository('AppBundle:Product')
-//				->findOneBy(array('code' => $row['Product Code']));
-//			if($product)
-//			{
-//				$em = $container->get('doctrine')->getManager();
-//				$em->remove($product);
-//				$em->flush();
-//			}
-//		}
-//
-//		return $report;
 	}
 }

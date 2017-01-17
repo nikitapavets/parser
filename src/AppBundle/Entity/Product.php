@@ -61,12 +61,12 @@ class Product
     /**
      * @ORM\Column(name="dtmAdded", type="datetime", nullable=true)
      */
-    private $added_at;
+    private $addedAt;
 
     /**
      * @ORM\Column(name="dtmDiscontinued", type="datetime", nullable=true)
      */
-    private $discontinued_at;
+    private $discontinuedAt;
 
     /**
      * @ORM\Column(name="stmTimestamp", type="datetime", options={"default":0}, columnDefinition="DATETIME on update CURRENT_TIMESTAMP")
@@ -206,7 +206,7 @@ class Product
      */
     public function setAddedAt($addedAt)
     {
-        $this->added_at = $addedAt;
+        $this->addedAt = $addedAt;
 
         return $this;
     }
@@ -218,7 +218,7 @@ class Product
      */
     public function getAddedAt()
     {
-        return $this->added_at;
+        return $this->addedAt;
     }
 
     /**
@@ -229,7 +229,7 @@ class Product
      */
     public function setDiscontinuedAt($discontinuedAt)
     {
-        $this->discontinued_at = $discontinuedAt;
+        $this->discontinuedAt = $discontinuedAt;
 
         return $this;
     }
@@ -241,7 +241,7 @@ class Product
      */
     public function getDiscontinuedAt()
     {
-        return $this->discontinued_at;
+        return $this->discontinuedAt;
     }
 
     /**

@@ -33,7 +33,7 @@ class ProductRepositoryFunctionalTest extends KernelTestCase
 			->findAll()
 		;
 
-		$this->assertCount(23, $products);
+		$this->assertCount(24, $products);
 	}
 
 	/**
