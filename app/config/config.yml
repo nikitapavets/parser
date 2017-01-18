@@ -13,6 +13,7 @@ parameters:
     scv_product_stock: 'Stock'
     scv_product_cost: 'Cost in GBP'
     scv_product_discontinued: 'Discontinued'
+    scv_product_discontinued_success: 'yes'
 
 framework:
     #esi:             ~

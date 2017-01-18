@@ -124,7 +124,7 @@ class Parser
 
                 $array = $serializer->normalize($product);
                 $array['addedAt'] = new \DateTime();
-                if($row[$container->getParameter('scv_product_discontinued')] == 'yes')
+                if($row[$container->getParameter('scv_product_discontinued')] == $container->getParameter('scv_product_discontinued_success'))
                 {
                     $array['discontinuedAt'] = new \DateTime();
                 }
