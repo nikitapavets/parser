@@ -9,22 +9,24 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 class ParseFileCommandTest extends KernelTestCase
 {
-	/**
-	 * Test parsing svg file and import this to database
-	 */
-	public function testParseStockFile()
-	{
-		self::bootKernel();
-		$application = new Application(self::$kernel);
-		$application->add(new ParseFileCommand());
+    /**
+     * Test parsing svg file and import this to database
+     */
+    public function testParseStockFile()
+    {
+        self::bootKernel();
+        $application = new Application(self::$kernel);
+        $application->add(new ParseFileCommand());
 
-		$command = $application->find('app:parse-scv');
-		$commandTester = new CommandTester($command);
-		$commandTester->execute(array(
-			'command'  => $command->getName(),
-			'filename' => '/documents/stock.csv',
-		));
-		$output = $commandTester->getDisplay();
-		$this->assertContains('Processed: 29, Successful: 24, Skipped: 5', $output);
-	}
+        $command = $application->find('app:parse-scv');
+        $commandTester = new CommandTester($command);
+        $commandTester->execute(
+            array(
+                'command' => $command->getName(),
+                'filename' => '/documents/stock.csv',
+            )
+        );
+        $output = $commandTester->getDisplay();
+        $this->assertContains('Processed: 29, Successful: 24, Skipped: 5', $output);
+    }
 }
