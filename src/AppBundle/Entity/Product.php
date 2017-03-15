@@ -4,12 +4,15 @@ namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * Class Product
  * @package AppBundle\Entity
  * @ORM\Entity
  * @ORM\Table(name="tblProductData")
+ * @UniqueEntity("strProductCode")
  * @Assert\Expression(
  *     "(this.getIntProductCost() >= 5 || this.getIntProductStock() >= 10)",
  *     message="Cost should be greater than or equal to 5 and Stock should be greater than or equal to 10."
@@ -58,7 +61,8 @@ class Product
     private $intProductCost;
 
     /**
-     * @ORM\Column(name="dtmAdded", type="datetime", nullable=true)
+     * @Gedmo\Timestampable(on="create")
+     * @ORM\Column(name="dtmAdded", type="datetime")
      */
     private $dtmAdded;
 
@@ -68,9 +72,24 @@ class Product
     private $dtmDiscontinued;
 
     /**
-     * @ORM\Column(name="stmTimestamp", type="datetime", options={"default":0}, columnDefinition="DATETIME on update CURRENT_TIMESTAMP")
+     * @ORM\Column(name="stmTimestamp", type="datetime", options={"default":0},
+     *     columnDefinition="DATETIME on update CURRENT_TIMESTAMP")
      */
     private $stmTimestamp;
+
+    /**
+     * @param $discontinuedCell
+     * @param $validDiscontinuedCell
+     * @return \DateTime|null
+     */
+    public static function validateIsDiscontinued($discontinuedCell, $validDiscontinuedCell)
+    {
+        if ($discontinuedCell == $validDiscontinuedCell) {
+            return new \DateTime();
+        }
+
+        return null;
+    }
 
     /**
      * Get intProductDataId
@@ -169,7 +188,7 @@ class Product
      */
     public function setIntProductStock($intProductStock)
     {
-        $this->intProductStock = $intProductStock;
+        $this->intProductStock = (int)$intProductStock;
 
         return $this;
     }
@@ -205,19 +224,6 @@ class Product
     public function getDtmAdded()
     {
         return $this->dtmAdded;
-    }
-
-    /**
-     * Set dtmAdded
-     *
-     * @param \DateTime $dtmAdded
-     * @return Product
-     */
-    public function setDtmAdded(\DateTime $dtmAdded)
-    {
-        $this->dtmAdded = $dtmAdded;
-
-        return $this;
     }
 
     /**
@@ -264,19 +270,5 @@ class Product
         $this->stmTimestamp = $stmTimestamp;
 
         return $this;
-    }
-
-    /**
-     * @param string $discontinuedCell
-     * @param string $validDiscontinuedCell
-     * @return Product|bool
-     */
-    public function setIfDiscontinued($discontinuedCell, $validDiscontinuedCell)
-    {
-        if ($discontinuedCell == $validDiscontinuedCell) {
-            return $this->setDtmDiscontinued(new \DateTime());
-        }
-
-        return false;
     }
 }

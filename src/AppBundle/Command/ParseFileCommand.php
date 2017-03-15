@@ -3,11 +3,11 @@
 namespace AppBundle\Command;
 
 use AppBundle\Parser;
-use AppBundle\Product;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Validator\ConstraintViolation;
 
 class ParseFileCommand extends ContainerAwareCommand
 {
@@ -22,26 +22,41 @@ class ParseFileCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        /**
-         * @var Parser $parser
-         */
         $parser = $this->getContainer()->get('app.parser');
-        $parser->setFilename($this->getContainer()->getParameter('kernel.root_dir').$input->getArgument('filename'));
-        $report = $parser->saveProducts($this->getContainer());
+        $scvFileName = $this->getContainer()->getParameter('kernel.root_dir').$input->getArgument('filename');
+        $parser->setFilename($scvFileName);
+
+        $report = $parser->process();
+        $this->showReport($report, $output);
+    }
+
+    /**
+     * @param array $report
+     * @param OutputInterface $output
+     */
+    private function showReport($report, OutputInterface $output)
+    {
         if ($report) {
             $output->writeln(
                 'Processed: '.$report['general']['processed'].
                 ', Successful: '.$report['general']['successful'].
                 ', Skipped: '.$report['general']['skipped']
             );
-            if ($report['errors_description']) {
-                $output->writeln('Errors:');
-                foreach ($report['errors_description'] as $errorDescription) {
-                    $output->writeln($errorDescription['product_code']);
-                    $output->writeln($errorDescription['errors']);
+            if ($report['no_validated_products']) {
+                $output->writeln('Import errors:');
+                foreach ($report['no_validated_products'] as $productCode => $productErrors) {
+                    $output->writeln('Product '.$productCode.' failed with errors:');
+                    foreach ($productErrors as $productError) {
+                        /**
+                         * @var ConstraintViolation $productError
+                         */
+                        $output->writeln(
+                            ($productError->getPropertyPath() ? $productError->getPropertyPath().' - ' : '').
+                            $productError->getMessage()
+                        );
+                    }
                 }
             }
         }
-
     }
 }

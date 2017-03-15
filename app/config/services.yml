@@ -4,5 +4,20 @@ parameters:
 #    parameter_name: value
 
 services:
-    app.parser:
-        class: AppBundle\Parser
+  app.validators.product_validator_step:
+    class: AppBundle\Validators\ProductValidatorStep
+    calls:
+      - [ setContainer, [ '@service_container' ] ]
+
+  app.parser:
+    class: AppBundle\Parser
+    calls:
+      - [ setContainer, [ '@service_container' ] ]
+
+  gedmo.listener.timestampable:
+    class: Gedmo\Timestampable\TimestampableListener
+    tags:
+      - { name: doctrine.event_subscriber, connection: default }
+    calls:
+      - [ setAnnotationReader, [ '@annotation_reader' ] ]
+

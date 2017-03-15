@@ -7,12 +7,13 @@ imports:
 # http://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     locale: en
-    scv_product_code: 'Product Code'
-    scv_product_name: 'Product Name'
-    scv_product_description: 'Product Description'
-    scv_product_stock: 'Stock'
-    scv_product_cost: 'Cost in GBP'
-    scv_product_discontinued: 'Discontinued'
+    scv_product_code: 'strProductCode'
+    scv_product_name: 'strProductName'
+    scv_product_description: 'strProductDesc'
+    scv_product_stock: 'intProductStock'
+    scv_product_cost: 'intProductCost'
+    scv_product_discontinued: 'dtmDiscontinued'
+    scv_product_added: 'dtmAdded'
     scv_product_discontinued_success: 'yes'
 
 framework:
