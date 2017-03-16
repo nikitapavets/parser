@@ -10,7 +10,6 @@ use Port\Steps\StepAggregator as Workflow;
 use Port\Csv\CsvReader;
 use Port\Doctrine\DoctrineWriter;
 use Port\Steps\Step\ValueConverterStep;
-use AppBundle\Validators\ProductValidatorStep;
 use SplFileObject;
 
 class Parser implements ContainerAwareInterface
